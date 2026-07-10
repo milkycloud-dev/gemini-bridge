@@ -1,4 +1,7 @@
-# Gemini Bridge
+<div align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Google_Gemini_logo.svg" alt="Gemini Logo" width="120" />
+  <h1>Gemini Bridge</h1>
+</div>
 
 Language: [English](#english) | [Russian](#russian)
 

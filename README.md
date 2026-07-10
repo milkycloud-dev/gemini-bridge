@@ -3,61 +3,23 @@
   <h1>Gemini Bridge</h1>
 </div>
 
-Language: [English](#english) | [Russian](#russian)
-
----
-
-<a name="english"></a>
-## English
-
-Gemini Bridge is a full-stack proxy and web interface designed to provide seamless, secure access to Google's Gemini AI API from restricted regions. It features a scalable FastAPI backend with a robust Telegram notification system, and a modern, responsive Flutter web client. It also includes an administrative panel to review chat histories and manage user access.
-
-### Features
-* Secure Access Control: Requires an App Secret and Hardware ID for registration, and dispenses secure Server Tokens for subsequent API calls.
-* Telegram Notifications: Admins receive instant Telegram notifications when a new user registers or requests an access token.
-* Custom Token Assignment: Users are placed in a waiting queue until an admin assigns them a dedicated Gemini API key.
-* Modern UI: Built with Flutter, the web client features a beautiful chat interface, dark mode aesthetics, and markdown support.
-* File Uploads: Supports uploading images and files for Gemini multimodal processing.
-* Admin Panel: A Python desktop tool for managing user API keys and downloading chat histories securely.
-* Dockerized: Fully containerized using Docker and Nginx for easy deployment.
-
-### Quick Start
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/milkycloud-dev/gemini-bridge.git
-   cd gemini-bridge
-   ```
-
-2. Configure Secrets:
-   Run the setup script to securely configure your tokens and secrets.
-   ```bash
-   python setup.py
-   ```
-   You will be prompted for your Telegram Bot Token, Chat ID, Server IP/Domain, and a secure App Secret.
-
-3. Run the Backend:
-   ```bash
-   docker-compose up -d --build
-   ```
-
-4. Build the Web Client:
-   Ensure you have Flutter installed, then run:
-   ```bash
-   cd web-client
-   flutter build web --release
-   ```
-   Deploy the `build/web` folder to your preferred hosting provider (e.g. GitHub Pages, Nginx, Vercel).
-
-5. Admin Panel:
-   Navigate to the `admin_panel` folder and run `admin.bat` (Windows) or `app.py` directly. This tool connects to your VPS using SCP and provides a UI to review chats.
+Language: [Русский](#russian) | [English](#english)
 
 ---
 
 <a name="russian"></a>
-## Russian
+## Русский
 
 Gemini Bridge -- это полнофункциональный прокси-сервер и веб-интерфейс, предназначенный для обеспечения бесперебойного и безопасного доступа к Gemini AI API от Google из регионов с ограничениями. Он включает масштабируемый бэкенд на FastAPI с надежной системой уведомлений в Telegram и современный адаптивный веб-клиент на Flutter. Также в комплекте идет панель администратора для управления пользователями и просмотра истории.
+
+### Демонстрация
+<div align="center">
+  <img src="screenshots/main_page.png" alt="Главная страница" width="800" />
+  <br/><br/>
+  <img src="screenshots/waiting_screen.png" alt="Окно ожидания токена" width="800" />
+  <br/><br/>
+  <img src="screenshots/chat_window.png" alt="Окно чата с Gemini" width="800" />
+</div>
 
 ### Особенности
 * Безопасный контроль доступа: Для регистрации требуется App Secret и Hardware ID. Для последующих вызовов API выдаются безопасные серверные токены.
@@ -98,3 +60,59 @@ Gemini Bridge -- это полнофункциональный прокси-се
 
 5. Панель администратора:
    Перейдите в папку `admin_panel` и запустите `admin.bat` (для Windows) или `app.py`. Приложение скачает базу данных с вашего VPS и откроет интерфейс для модерации чатов.
+
+---
+
+<a name="english"></a>
+## English
+
+Gemini Bridge is a full-stack proxy and web interface designed to provide seamless, secure access to Google's Gemini AI API from restricted regions. It features a scalable FastAPI backend with a robust Telegram notification system, and a modern, responsive Flutter web client. It also includes an administrative panel to review chat histories and manage user access.
+
+### Demonstration
+<div align="center">
+  <img src="screenshots/main_page.png" alt="Main Page" width="800" />
+  <br/><br/>
+  <img src="screenshots/waiting_screen.png" alt="Token Waiting Screen" width="800" />
+  <br/><br/>
+  <img src="screenshots/chat_window.png" alt="Chat Window with Gemini" width="800" />
+</div>
+
+### Features
+* Secure Access Control: Requires an App Secret and Hardware ID for registration, and dispenses secure Server Tokens for subsequent API calls.
+* Telegram Notifications: Admins receive instant Telegram notifications when a new user registers or requests an access token.
+* Custom Token Assignment: Users are placed in a waiting queue until an admin assigns them a dedicated Gemini API key.
+* Modern UI: Built with Flutter, the web client features a beautiful chat interface, dark mode aesthetics, and markdown support.
+* File Uploads: Supports uploading images and files for Gemini multimodal processing.
+* Admin Panel: A Python desktop tool for managing user API keys and downloading chat histories securely.
+* Dockerized: Fully containerized using Docker and Nginx for easy deployment.
+
+### Quick Start
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/milkycloud-dev/gemini-bridge.git
+   cd gemini-bridge
+   ```
+
+2. Configure Secrets:
+   Run the setup script to securely configure your tokens and secrets.
+   ```bash
+   python setup.py
+   ```
+   You will be prompted for your Telegram Bot Token, Chat ID, Server IP/Domain, and a secure App Secret.
+
+3. Run the Backend:
+   ```bash
+   docker-compose up -d --build
+   ```
+
+4. Build the Web Client:
+   Ensure you have Flutter installed, then run:
+   ```bash
+   cd web-client
+   flutter build web --release
+   ```
+   Deploy the `build/web` folder to your preferred hosting provider (e.g. GitHub Pages, Nginx, Vercel).
+
+5. Admin Panel:
+   Navigate to the `admin_panel` folder and run `admin.bat` (Windows) or `app.py` directly. This tool connects to your VPS using SCP and provides a UI to review chats.

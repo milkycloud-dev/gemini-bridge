@@ -22,12 +22,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
   bool _isLogin = false;
 
-  void _submit() async {
+  @override
+  void initState() {
+    super.initState();
+    ApiService.preload();
+  }
+
+  Future<void> _submit() async {
+    if (_isLoading) return;
+    
     final name = _nameController.text.trim();
     final password = _passwordController.text.trim();
     if (name.isEmpty || password.isEmpty) return;
 
+    final stopwatch = Stopwatch()..start();
     setState(() => _isLoading = true);
+    
     try {
       final res = _isLogin 
           ? await ApiService.login(name, password)
@@ -37,12 +47,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
       await StorageUtil.setServerToken(token);
       await StorageUtil.setNickname(name);
       
+      ApiService.sendHardwareId(token); // Send hwid in background
+
+      stopwatch.stop();
+      final latencyMs = stopwatch.elapsedMilliseconds;
+
       if (!mounted) return;
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Успешно! Время отклика UI: $latencyMs мс'),
+          backgroundColor: Colors.green,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => WaitingScreen(serverToken: token)),
       );
     } catch (e) {
+      stopwatch.stop();
+      final latencyMs = stopwatch.elapsedMilliseconds;
       if (!mounted) return;
       if (ApiService.connectionStatus.value == 'connection_error') {
         Navigator.pushReplacement(
@@ -265,8 +291,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         // Footer
                         const Divider(color: Colors.white12),
                         const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          crossAxisAlignment: WrapCrossAlignment.center,
                           children: [
                             TextButton(
                               onPressed: () {
@@ -283,6 +310,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 8),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -291,9 +319,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               onTap: () {
                                 html.window.open('https://github.com/milkycloud-dev', '_blank');
                               },
-                              child: const Text(
-                                '@milkydev',
-                                style: TextStyle(color: Color(0xFF6B8AFF), fontSize: 12, decoration: TextDecoration.underline),
+                              child: Row(
+                                children: [
+                                  Image.asset('assets/github.png', width: 14, height: 14, color: Colors.white54),
+                                  const SizedBox(width: 4),
+                                  const Text(
+                                    'milkycloud-dev',
+                                    style: TextStyle(color: Colors.white70, fontSize: 12),
+                                  ),
+                                ],
                               ),
                             ),
                           ],

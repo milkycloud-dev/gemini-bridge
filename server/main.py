@@ -75,7 +75,8 @@ async def telegram_poller():
     url = f"https://api.telegram.org/bot{bot_token.strip()}/getUpdates"
     while True:
         try:
-            res = requests.get(f"{url}?offset={offset}&timeout=30", timeout=35)
+            # Use asyncio.to_thread to prevent blocking the main FastAPI event loop
+            res = await asyncio.to_thread(requests.get, f"{url}?offset={offset}&timeout=30", timeout=35)
             if res.status_code == 200:
                 data = res.json()
                 for update in data.get("result", []):
@@ -101,7 +102,7 @@ async def telegram_poller():
                                     db.commit()
                                     chat_id = msg["chat"]["id"]
                                     send_url = f"https://api.telegram.org/bot{bot_token.strip()}/sendMessage"
-                                    requests.post(send_url, json={
+                                    await asyncio.to_thread(requests.post, send_url, json={
                                         "chat_id": chat_id,
                                         "text": f"✅ Token assigned to {user_name}!",
                                         "reply_to_message_id": msg["message_id"]
@@ -185,7 +186,7 @@ def get_current_client(
     x_app_secret: str = Header(..., alias="X-App-Secret"),
     db: Session = Depends(get_db)
 ):
-    if x_app_secret != "<YOUR_APP_SECRET>":
+    if x_app_secret != "GeminiBridge-SecureClient-2026!":
         raise HTTPException(status_code=403, detail="Unauthorized client")
         
     client = db.query(models.Client).filter(models.Client.server_token == server_token).first()
@@ -216,7 +217,7 @@ def register(
     x_app_secret: str = Header(..., alias="X-App-Secret"),
     db: Session = Depends(get_db)
 ):
-    if x_app_secret != "<YOUR_APP_SECRET>":
+    if x_app_secret != "GeminiBridge-SecureClient-2026!":
         raise HTTPException(status_code=403, detail="Unauthorized client")
         
     # Check if auto-assign is enabled
@@ -240,7 +241,7 @@ def register(
     check_auth_rate_limit(ip_addr)
     
     # Generate bcrypt hash
-    salt = bcrypt.gensalt()
+    salt = bcrypt.gensalt(rounds=4)
     hashed_pwd = bcrypt.hashpw(req.password.encode('utf-8'), salt).decode('utf-8')
     
     client = models.Client(name=req.name, password_hash=hashed_pwd, ip_address=ip_addr, hwid=req.hwid, device_info=req.device_info)
@@ -249,8 +250,7 @@ def register(
     db.refresh(client)
     logger.info(f"New client registered: {client.name} (IP: {ip_addr})")
     
-    import threading
-    threading.Thread(target=notify_telegram, args=(req.name, req.hwid, ip_addr), daemon=True).start()
+    background_tasks.add_task(notify_telegram, req.name, req.hwid, ip_addr)
     
     return {"server_token": client.server_token, "message": "Registration successful"}
 
@@ -261,7 +261,7 @@ def login(
     x_app_secret: str = Header(..., alias="X-App-Secret"),
     db: Session = Depends(get_db)
 ):
-    if x_app_secret != "<YOUR_APP_SECRET>":
+    if x_app_secret != "GeminiBridge-SecureClient-2026!":
         raise HTTPException(status_code=403, detail="Unauthorized client")
         
     client = db.query(models.Client).filter(models.Client.name == req.name).first()
@@ -275,6 +275,12 @@ def login(
         is_valid = bcrypt.checkpw(req.password.encode('utf-8'), client.password_hash.encode('utf-8'))
         if not is_valid:
             raise HTTPException(status_code=403, detail="Неверное имя пользователя или пароль.")
+            
+        # Upgrade hash if it uses older/higher rounds
+        if not client.password_hash.startswith("$2b$04$"):
+            salt = bcrypt.gensalt(rounds=4)
+            client.password_hash = bcrypt.hashpw(req.password.encode('utf-8'), salt).decode('utf-8')
+            
     except Exception:
         raise HTTPException(status_code=403, detail="Неверное имя пользователя или пароль.")
         
@@ -301,9 +307,18 @@ def set_custom_token(req: CustomTokenRequest, client: models.Client = Depends(ge
     db.commit()
     return {"status": "ok"}
 
+class HwidRequest(BaseModel):
+    hwid: str
+
+@app.post("/api/update_hwid")
+def update_hwid(req: HwidRequest, client: models.Client = Depends(get_current_client), db: Session = Depends(get_db)):
+    client.hwid = req.hwid
+    db.commit()
+    return {"status": "ok"}
+
 @app.post("/api/cheat_demo")
 def activate_demo(client: models.Client = Depends(get_current_client), db: Session = Depends(get_db)):
-    client.gemini_token = "<YOUR_DEMO_GEMINI_API_KEY>"
+    client.gemini_token = "DEMO_TOKEN_NOT_REAL"
     db.commit()
     
     bot_token = os.environ.get("TELEGRAM_BOT_TOKEN")

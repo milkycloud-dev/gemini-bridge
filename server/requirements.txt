@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+typer
+python-multipart
+google-generativeai
+pydantic
+passlib
+bcrypt==3.2.0

@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  gemini-server:
+    build: .
+    container_name: gemini-bridge-server
+    restart: always
+    environment:
+      - TELEGRAM_BOT_TOKEN=<YOUR_TELEGRAM_BOT_TOKEN>
+      - TELEGRAM_CHAT_ID=<YOUR_TELEGRAM_CHAT_ID>
+      - DATA_DIR=/data
+    volumes:
+      - ./data:/data
+
+  gemini-web:
+    image: nginx:alpine
+    container_name: gemini-bridge-web
+    restart: always
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./web-build:/usr/share/nginx/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./data/cert.pem:/etc/nginx/ssl/cert.pem
+      - ./data/key.pem:/etc/nginx/ssl/key.pem

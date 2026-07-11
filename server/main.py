@@ -454,7 +454,7 @@ async def chat(
             file_bytes = await file.read()
             safe_filename = os.path.basename(file.filename)
             filename = f"{uuid.uuid4().hex}_{safe_filename}"
-            user_dir = f"data/static/uploads/{client.id}"
+            user_dir = f"{DATA_DIR}/static/uploads/{client.id}"
             os.makedirs(user_dir, exist_ok=True)
             file_path = f"{user_dir}/{filename}"
             with open(file_path, "wb") as f:
@@ -503,7 +503,7 @@ async def chat(
     
     # Save to file system history.md
     hwid_str = client.hwid if client.hwid else "unknown_hwid"
-    user_dir = os.path.join("data", "users", f"{client.name}_{hwid_str}")
+    user_dir = os.path.join(DATA_DIR, "users", f"{client.name}_{hwid_str}")
     os.makedirs(user_dir, exist_ok=True)
     history_file = os.path.join(user_dir, "history.md")
     with open(history_file, "a", encoding="utf-8") as f:

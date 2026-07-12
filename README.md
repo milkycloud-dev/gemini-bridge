@@ -13,13 +13,11 @@ Language: [Русский](#russian) | [English](#english)
 Gemini Bridge - это полнофункциональный прокси-сервер и веб-интерфейс, предназначенный для обеспечения бесперебойного и безопасного доступа к Gemini AI API от Google из регионов с ограничениями. Он включает масштабируемый бэкенд на FastAPI с надежной системой уведомлений в Telegram и современный адаптивный веб-клиент на Flutter. Также в комплекте идет панель администратора для управления пользователями и просмотра истории.
 
 ### Демонстрация
-<table align="center">
-  <tr>
-    <td align="center"><img src="screenshots/main_page.png" alt="Главная страница"/><br/><b>Главная страница</b></td>
-    <td align="center"><img src="screenshots/chat_window.png" alt="Окно ожидания токена"/><br/><b>Окно ожидания токена</b></td>
-    <td align="center"><img src="screenshots/waiting_screen.png" alt="Окно чата с Gemini"/><br/><b>Окно чата с Gemini</b></td>
-  </tr>
-</table>
+![Главная страница](screenshots/main_page.png)
+
+![Окно ожидания токена](screenshots/chat_window.png)
+
+![Окно чата с Gemini](screenshots/waiting_screen.png)
 
 ### Особенности
 * Безопасный контроль доступа: Для регистрации требуется App Secret и Hardware ID. Для последующих вызовов API выдаются безопасные серверные токены.

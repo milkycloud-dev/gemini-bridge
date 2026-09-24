@@ -64,7 +64,7 @@ Gemini Bridge - это полнофункциональный прокси-се�
 <a name="english"></a>
 ## English
 
-Gemini Bridge is a full-stack proxy and web interface designed to provide seamless, secure access to Google's Gemini AI API from restricted regions. It features a scalable FastAPI backend with a robust Telegram notification system, and a modern, responsive Flutter web client. It also includes an administrative panel to review chat histories and manage user access.
+Gemini Bridge is a full-stack proxy and web interface for reaching Google's Gemini AI API from regions where it is blocked. The backend is FastAPI with Telegram notifications, the web client is Flutter. There is also an admin panel for reviewing chat histories and managing user access.
 
 
 ### Features

@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Backend syntax
+        run: python3 -m py_compile $(git ls-files '*.py')
+
+      - name: Backend image
+        run: docker build -q -t gemini-bridge-server .
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+
+      - name: Web client
+        working-directory: web-client
+        run: |
+          flutter pub get
+          flutter build web --release
+          cd build/web && zip -qr ../../../gemini-bridge-web.zip .
+
+      - name: Source archive
+        run: |
+          name="gemini-bridge-${GITHUB_REF_NAME#v}"
+          git archive --format=tar.gz --prefix="$name/" -o "$name.tar.gz" HEAD
+
+      - name: Release notes
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          ver="${GITHUB_REF_NAME#v}"
+          awk -v v="$ver" '/^## / {p = ($2 == v); next} p' CHANGELOG.md > notes.md
+          test -s notes.md || echo "Release $GITHUB_REF_NAME" > notes.md
+          ls -l *.zip *.tar.gz
+
+      - uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          name: Gemini Bridge ${{ github.ref_name }}
+          body_path: notes.md
+          files: |
+            gemini-bridge-web.zip
+            gemini-bridge-*.tar.gz
